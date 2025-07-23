@@ -18,6 +18,8 @@ public class MultiThreadDownloader {
     String contentName;
     List<DownloadTask> task = new ArrayList<DownloadTask>();
     ExecutorService pool = Executors.newCachedThreadPool();
+    DownloadController controller = new DownloadController();
+
 
 
     public void download(String fileURL, int threadCount) throws IOException {
@@ -46,7 +48,7 @@ public class MultiThreadDownloader {
             } else {
                 endIndex = beginIndex + pieceSize - 1;
             }
-            task.add(new DownloadTask(file ,fileURL ,beginIndex ,endIndex));
+            task.add(new DownloadTask(file ,fileURL ,beginIndex ,endIndex, controller));
             beginIndex = endIndex + 1;
         }
         // 3. 启动线程池并等待所有线程完成
@@ -57,5 +59,15 @@ public class MultiThreadDownloader {
         // 4. 结束http连接,关闭线程池
         httpConn.disconnect();
         pool.shutdown();
+    }
+
+
+    // 暴露控制方法
+    public void pause() {
+        controller.pause();
+    }
+
+    public void resume() {
+        controller.resume();
     }
 }
